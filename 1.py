@@ -13,6 +13,11 @@ cell_color = 0, 51, 102
 
 # cell side size
 a = 90
+
+# loading images for x and o
+x = pg.transform.scale(pg.image.load('x.png'), (a, a))
+o = pg.transform.scale(pg.image.load('o.png'), (a, a))
+
 # list of cell coordinates
 cell_list = []
 cell_x = 420
@@ -39,13 +44,25 @@ class Cell(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x0
         self.rect.y = y0
+        self.clicked = False
+
+    def update(self, ev, pos):
+        #print(self.clicked)
+        # if someone clicks the mouse button
+        if ev.type == pg.MOUSEBUTTONDOWN:
+            # if mouse cursor is in the cell
+            if self.rect.x < pos[0] < self.rect.x + a and self.rect.y < pos[1] < self.rect.y + a:
+                self.clicked = True
 
     def draw(self):
+        if self.clicked:
+            self.image = x
         screen.blit(self.image, self.rect)
 
     def lightning(self, pos):
-        if self.rect.x < pos[0] < self.rect.x + a and self.rect.y < pos[1] < self.rect.y + a:
-            pg.draw.rect(screen, (255, 255, 255), pg.Rect(self.rect.x, self.rect.y, a, a))
+        if not self.clicked:
+            if self.rect.x < pos[0] < self.rect.x + a and self.rect.y < pos[1] < self.rect.y + a:
+                pg.draw.rect(screen, (255, 255, 255), pg.Rect(self.rect.x, self.rect.y, a, a))
 
 
 cell_group = pg.sprite.Group()
@@ -71,5 +88,7 @@ while run:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run = False
+        cell_group.update(event, mouse_pos)
 
     pg.display.flip()
+
